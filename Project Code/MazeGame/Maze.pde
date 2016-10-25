@@ -78,18 +78,25 @@ class Maze {
     int rectHeight = int(outerHeight) - frameWidth;
     
     // draw 3 rects with increasingly thinner & lighter lines to simulate 3-D effect 
+    /*  (drawing them on separate z layers seems to reduce the number of weird 
+         rendering artifacts) */
+    pushMatrix();
+    translate(0, 0, 1);
     rectMode(CENTER);
     noFill();
     float corner = frameWidth * .5;
     stroke(colors.get("shadow"));
     strokeWeight(frameWidth);
     rect(x, y, rectWidth, rectHeight, corner);
+    translate(0, 0, 1);
     stroke(colors.get("mainColor"));
     strokeWeight(frameWidth * .8);
     rect(x, y, rectWidth, rectHeight, corner);
+    translate(0, 0, 1);
     stroke(colors.get("highlight"));
     strokeWeight(frameWidth * .2);
     rect(x, y, rectWidth, rectHeight, corner);
+    popMatrix();
   }
   
   private void drawTray(float xTilt, float yTilt) {
