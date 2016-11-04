@@ -17,8 +17,6 @@ void setup() {
   size(1000, 800, P3D);
   frameRate(20);
   maze = new Maze(width-200, height);
-  println(radians(3));
-  println(radians(-3));
   
   background(50);
 
