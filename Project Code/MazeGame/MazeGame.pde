@@ -4,9 +4,11 @@ Maze maze;
 float xTilt = 0;  
 float yTilt = 0;
 
+// possible controllers
 Controller mouseController = new MouseController();
 Controller keyController = new KeyController();
 Controller currentController = mouseController;
+
 
 void setup() {
   size(1000, 800, P3D);
@@ -14,15 +16,19 @@ void setup() {
   maze = new Maze(width-200, height);
   
   background(50);
-
 }
 
 void draw() {
+  // Controller selection UI
   drawButtons();
-    
+  
+  // Maze
   currentController.update();
   maze.display(currentController.xTilt, currentController.yTilt);
 }
+
+
+// Passing on key events to keyController
 
 void keyPressed() {
   if (currentController == keyController) keyController.keyAction();
@@ -31,6 +37,7 @@ void keyPressed() {
 void keyReleased() {
   if (currentController == keyController) keyController.keyReset();
 }
+
 
 // == Controller Selection UI =======================================
 
