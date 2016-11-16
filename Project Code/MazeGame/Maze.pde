@@ -13,7 +13,6 @@ class Maze {
   private final IntDict boxColors = new IntDict();
   private final IntDict trayColors = new IntDict();
   private final IntDict ballColors = new IntDict();
- // private final color ballColor = color(#F00F0F);
   
   // ball 
   private Point ballPos = new Point(0, 0);

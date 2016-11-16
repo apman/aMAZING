@@ -1,15 +1,29 @@
 class KeyController extends Controller {
 
   
-  float xTiltChange = 0;   
-  float yTiltChange = 0;   
-  float TiltChangeRate = 0.001;
+  private float xTiltChange = 0;   
+  private float yTiltChange = 0;   
+  private float TiltChangeRate = 0.001;
 
   KeyController() {
   }
+
   
+  public void update() {
+    // translate cursor key strokes into tray tilt increase/decrease  (max ~ -3 and 3 degrees (in rad))
+    xTilt += xTiltChange;  
+    yTilt += yTiltChange;
+    print("updating tilt: " + xTilt + " / " + yTilt);
+    constrain(xTilt, -0.05, 0.05);
+    constrain(yTilt, -0.05, 0.05);
+    println(" constrained to: " + xTilt + " / " + yTilt);
+  }
+
   
-  void keyAction() {
+  /*
+  * called by keyPressed() in main MazeGame
+  */
+  public void keyAction() {
     println("key pressed");
     if (key == CODED) {
       switch(keyCode) {
@@ -32,18 +46,10 @@ class KeyController extends Controller {
   }
   
 
-  void update() {
-    // translate cursor key strokes into tray tilt increase/decrease  (max ~ -3 and 3 degrees (in rad))
-    xTilt += xTiltChange;  
-    yTilt += yTiltChange;
-    print("updating tilt: " + xTilt + " / " + yTilt);
-    constrain(xTilt, -0.05, 0.05);
-    constrain(yTilt, -0.05, 0.05);
-    println(" constrained to: " + xTilt + " / " + yTilt);
-  }
-
-
-  void keyReset() {
+  /*
+  * called by keyReleased() in main MazeGame
+  */
+  public void keyReset() {
     if (key == CODED) {
       switch(keyCode) {
       case UP: 
