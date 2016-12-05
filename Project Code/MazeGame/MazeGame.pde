@@ -12,8 +12,8 @@ Controller currentController = mouseController;
 
 void setup() {
   size(1000, 800, P3D);
-  frameRate(20);
-  maze = new Maze(width-200, height);
+  frameRate(30);
+  maze = new Maze(width, height);
   
   background(50);
 }
