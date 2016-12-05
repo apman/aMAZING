@@ -6,12 +6,18 @@ class Controller {
   Controller() {  
   }
   
+  /* Functions *every* controler must implement: */
+  
   void update() {
     
   }
+
   
-  // for some reason functions only defined in the subclass seem invisible to the 
-  //  main code, even if you specifically reference a KeyController object 
+  /* Functions specific to KeyController: 
+     (for some reason functions only defined in the subclass seem invisible to the 
+       main code, even if you specifically reference a KeyController object) 
+  */
+
   public void keyAction() { 
   }
   
