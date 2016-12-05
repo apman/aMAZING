@@ -42,8 +42,11 @@ void keyReleased() {
 // == Controller Selection UI =======================================
 
 void drawButtons() {
+  pushMatrix();
+  translate(-20, 20, 40);
   drawButton("Use Mouse", width-180, 20, currentController != mouseController);
   drawButton("Use Keys", width-180, 100, currentController != keyController);
+  popMatrix();
 }
 
 void drawButton(String label, int x, int y, boolean active) {
