@@ -13,10 +13,8 @@ class KeyController extends Controller {
     // translate cursor key strokes into tray tilt increase/decrease  (max ~ -3 and 3 degrees (in rad))
     xTilt += xTiltChange;  
     yTilt += yTiltChange;
-    print("updating tilt: " + xTilt + " / " + yTilt);
-    constrain(xTilt, -0.05, 0.05);
-    constrain(yTilt, -0.05, 0.05);
-    println(" constrained to: " + xTilt + " / " + yTilt);
+    xTilt = constrain(xTilt, -0.05, 0.05);  // not actually working! ???
+    yTilt = constrain(yTilt, -0.05, 0.05);
   }
 
   
@@ -24,7 +22,6 @@ class KeyController extends Controller {
   * called by keyPressed() in main MazeGame
   */
   public void keyAction() {
-    println("key pressed");
     if (key == CODED) {
       switch(keyCode) {
       case UP: 
