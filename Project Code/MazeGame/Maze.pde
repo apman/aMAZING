@@ -22,8 +22,13 @@ class Maze {
   private final IntDict ballColors = new IntDict();
   
   // ball 
-  private Point ballPos = new Point(0, 0);
-  private float speedFactor = 360;  // the higher the factor the faster the ball
+  private Point ballPos = new Point(-430, -330);   // start in top left corner
+  private float xSpeed = 0;
+  private float ySpeed = 0;
+  private float accelerationFactor = 4;
+  
+  // option to only show a blank tray with the ball rolling (good for calibration)
+  boolean showMaze = true;
   
   
   // maze walls
@@ -34,33 +39,41 @@ class Maze {
   // 
   // TODO: maybe make a grid that is wider than the current square tray and then 
   //       depending on how many channels fit onto the tray, use only part of the 
-  //       grid ...
-  int[][][] wallEdgesH = {{},            
+  //       grid ... (oops, I think I already did that (so it should work with a square now 
+  //       TODO: ^ try and document properly
+  
+  int[][][] wallEdgesH = {{{0,12}},            
                           {{3,5},{6,7},{9,11}}, 
                           {{0,2},{5,6},{7,8}},
                           {{4,5},{7,9},{10,12}},
                           {{1,3},{4,5},{6,8},{9,10}},
-                          {{2,4},{8,9}},
+                          {{2,4},{5,6},{8,9}},
                           {{1,2},{4,6},{7,8},{10,11}},
                           {{0,1},{6,7},{10, 12}},
                           {{1,2},{7,8},{10, 11}},
                           {{2,3},{4,5},{7,9},{10,11}},
-                          {}};
-  int[][][] wallEdgesV = {{},            
+                          {{0,12}}};
+  int[][][] wallEdgesV = {{{0,10}},            
                           {{0,1},{3,6},{8,9}}, 
                           {{1,3},{6,8}},
                           {{1,3},{5,9}},
                           {{2,3},{6,8},{9,10}},
                           {{1,2},{4,6},{7,9}},
-                          {{0,1},{2,3},{4,9}},
+                          {{0,1},{2,3},{4,5},{6,9}},
                           {{1,2},{5,6},{9,10}},
                           {{1,2},{4,5},{6,8}},
                           {{1,3},{6,8}},
                           {{3,5}},
                           {{1,2},{4,6},{8,9}},
-                          {}};
-   Wall[][] wallsH = new Wall[0][0];
-   Wall[][] wallsV = new Wall[0][0];
+                          {{0,10}}};
+   
+   Wall[][] wallsH = new Wall[0][0];    // array of rows of horizontal walls
+   Wall[][] wallsV = new Wall[0][0];    // array of columns of vertical walls
+   
+   int[][] goalCoords = {{5,5},{7,1},{10,8}};
+   Goal[] goals = new Goal[goalCoords.length]; 
+   
+ 
  
   Maze(int _boxWidth, int _boxHeight) {
     
@@ -71,12 +84,14 @@ class Maze {
     boxColors.set("highlight",170);
     // tray
     trayColors.set("mainColor",170);
-    trayColors.set("shadow",50);
+    trayColors.set("shade",50);
     trayColors.set("highlight",240);
+    trayColors.set("shadow",100);
     // tray
     ballColors.set("mainColor",#F00F0F);
-    ballColors.set("shadow",#B43A3A);
+    ballColors.set("shade",#B43A3A);
     ballColors.set("highlight",#FFB9B9);
+    ballColors.set("shadow",100);
     
     // set some measurements 
     boxWidth = _boxWidth;
@@ -90,47 +105,86 @@ class Maze {
     // precalculated values for faster drawing
     topLeft = new Point(-trayWidth/2, -trayHeight/2);   
     topLeftBoundry = new Point(-trayWidth/2 + ballSize*.8, -trayHeight/2 + ballSize*.8);   
-    bottomRightBoundry = new Point(trayWidth/2 - ballSize*.8, trayHeight/2 - ballSize*.8); 
+    bottomRightBoundry = new Point(trayWidth/2 - ballSize*.5, trayHeight/2 - ballSize*.5); 
 
     pathWidthH = optimalPathWidth(trayWidth);
-    pathWidthV = optimalPathWidth(trayHeight);
-    //pathWidthH = optimalPathWidth(bottomRightBoundry.x - topLeftBoundry.x);
-    //pathWidthV = optimalPathWidth(bottomRightBoundry.y - topLeftBoundry.y);
-
+    pathWidthV = optimalPathWidth(trayHeight); 
+    
+    createGoals();
+    createWalls();
+  }
+  
+  void createWalls() {
 
     // Convert the conceptual edges (as in edges of a graph) from simple coordinates to  
     //  Wall objects with pre-calculated pixel positions
-    float cap = innerFrameWidth * .1;
+      
     for (int row = 0; row < wallEdgesH.length; row++) {
       int[][] wallRow = wallEdgesH[row];
       Wall[] walls = new Wall[0];
+      String type = "maze";
+      if (row == 0) {
+        type = "topFrame";
+      } else if (row == wallEdgesH.length - 1) {
+        type = "bottomFrame";
+      } 
+         // ^^ outside walls are invisible so they don't interfere with the rounded edges of the frame,
+         //    but the still act as barriers and have shadows, so they need to be treated a bit different
       for (int lineNum = 0; lineNum < wallRow.length; lineNum++) {
-        Wall wall = new Wall(new Point(topLeft.x + wallRow[lineNum][0] * pathWidthH - cap, 
-                                        topLeft.y + row * pathWidthV),
-                              new Point(topLeft.x + wallRow[lineNum][1] * pathWidthH + cap, 
-                                        topLeft.y + row * pathWidthV));
+        Wall wall = new Wall(new Point(topLeft.x + 5 + wallRow[lineNum][0] * pathWidthH, 
+                                        topLeft.y + 5 + row * pathWidthV),
+                              new Point(topLeft.x + 5 + wallRow[lineNum][1] * pathWidthH, 
+                                        topLeft.y + 5 + row * pathWidthV), type);
         walls = (Wall[])append(walls, wall);                               
       }
       wallsH = (Wall[][])append(wallsH, walls);
     }
     
+    /* NOTE: the ' + 5 ' above and below is to push the slightly shrunk maze (cp. the hack in optimalPathWidth() )
+             down & right a bit, so that the rounded ends of the maze walls don't stick out beyond the frame */
+    
    for (int col = 0; col < wallEdgesV.length; col++) {
       int[][] wallCol = wallEdgesV[col];
       Wall[] walls = new Wall[0];
+      String type = "maze";
+      if (col == 0) {
+        type = "leftFrame";
+      } else if (col == wallEdgesV.length - 1) {
+        type = "rightFrame";
+      } 
+         // ^^ outside walls are invisible so they don't interfere with the rounded edges of the frame,
+         //    but the still act as barriers and have shadows, so they need to be treated a bit different
       for (int lineNum = 0; lineNum < wallCol.length; lineNum++) {
-        Wall wall = new Wall(new Point(topLeft.x + col * pathWidthH, 
-                                        topLeft.y + wallCol[lineNum][0] * pathWidthV - cap),
-                              new Point(topLeft.x + col * pathWidthH, 
-                                        topLeft.y + wallCol[lineNum][1] * pathWidthV + cap));
+        Wall wall = new Wall(new Point(topLeft.x + 5 + col * pathWidthH, 
+                                        topLeft.y + 5 + wallCol[lineNum][0] * pathWidthV),
+                              new Point(topLeft.x + 5 + col * pathWidthH, 
+                                        topLeft.y + 5 + wallCol[lineNum][1] * pathWidthV), type);
         walls = (Wall[])append(walls, wall);                               
       }
       wallsV = (Wall[][])append(wallsV, walls);
+    }  
+  }
+  
+  void createGoals() {
+    for (int i=0; i < goalCoords.length; i++) {
+      goals[i] = new Goal(int(pathWidthH));
+      goals[i].pos = new Point(topLeft.x + 5 + goalCoords[i][0] * pathWidthH + pathWidthH/2, 
+                          topLeft.y + 5 + goalCoords[i][1] * pathWidthV + pathWidthV/2);
     }
-   
-}
+    /* NOTE: the ' + 5 ' above is to adjust the goal marker positions to the moved maze 
+              cp. the hack in createWalls() */
+    
+  }
+  
+  public void resetGoals() {
+    for (int i=0; i < goals.length; i++) {
+      goals[i].found = false; 
+    }
+  }
+  
   
   private float optimalPathWidth(float space) {
-    // calculate best distance between walls based on ballSize, trayWidth/trayHeight (= space)
+    // calculate best distance between walls based on ballSize and trayWidth or trayHeight (= space)
     
     // take a decent width to start with, see how many of them you can fit into 
     //  the tray width/height and then adjust the pathWidth to fit an even number of 
@@ -139,7 +193,9 @@ class Maze {
     int pathNum = round(space / pathWidth);
     pathWidth = space / pathNum;
     
-    return pathWidth;
+    return pathWidth - 1;    // The ' - 1 ' is a hack to make the maze a *little* bit smaller, so that the 
+                             //  rounded ends of the maze walls don't stick out beyond frame
+                             //  cp. createWalls(), where the slightly shrunk maze is then moved into the center
   }
   
   
@@ -209,27 +265,38 @@ class Maze {
     rectMode(CENTER);
     rect(0, 0, trayWidth, trayHeight);
     
+    
     // draw the maze
-    drawMaze();
+    if(showMaze) drawMaze(xTilt, yTilt);
     
     setBallPos(xTilt, yTilt);
-    drawBall(ballPos);
+    checkIfGoalIsReached();
+    drawBall(ballPos, xTilt, yTilt);
     
     // draw the frame
     drawFrame(0, 0, trayWidth + innerFrameWidth/2, trayHeight + innerFrameWidth/2, innerFrameWidth, trayColors);
-  }  
+  } 
   
+  
+  private void checkIfGoalIsReached() {
+    // check if the ball has reached one of the goals
+    for (int i = 0; i < goals.length; i++) {
+      goals[i].checkIfFound(ballPos); 
+    }
+    
+  }
+
   
   private void setBallPos(float xTilt, float yTilt) {
     
-    float xMovement = yTilt * speedFactor;  // negative tilt -> ball rolls left
-    float yMovement = xTilt * speedFactor;  // negative tilt -> ball rolls down
+    xSpeed += yTilt * accelerationFactor;  // negative tilt -> ball rolls left
+    ySpeed += xTilt * accelerationFactor;  // negative tilt -> ball rolls down
     
-    float xBounceFactor = xMovement;
-    float yBounceFactor = yMovement;
-    
+    float xMovement = xSpeed;
+    float yMovement = ySpeed;
+     
     // separate speed (movement) and direction, so the movement can be applied incrementally
-    //  while checking the walls (if the ball moves to much at once it skips the walls)
+    //  while checking the walls (if the ball moves too much at once it skips the walls)
     int xDirection = 1;
     int yDirection = 1;    
     if (xMovement < 0) {
@@ -238,35 +305,39 @@ class Maze {
     }
     if (yMovement < 0) {
       yDirection = -1;
-      yMovement = abs(xMovement);
+      yMovement = abs(yMovement);
     }
     
     while (xMovement > 0) {
       // update ball position based on the tray's tilt in increments small enough not to miss a wall
-      float moveBy = (xMovement > innerFrameWidth/2) ? innerFrameWidth/2 : xMovement;
+      float moveBy = (xMovement > innerFrameWidth/3) ? innerFrameWidth/4 : xMovement;
       ballPos.x += moveBy * xDirection;  
       xMovement -= moveBy;
-      // ensure it stays within the tray area
+      // ensure it stays within the tray area (even when the maze is turned off)
       ballPos.x = constrain(ballPos.x, topLeftBoundry.x, bottomRightBoundry.x);
-      // narrow down in area the ball currently is
-      float col = (ballPos.x - topLeft.x)/pathWidthH;
-      // adjust ball position to avoid the maze walls to the left and the right
-      if (avoidWallsV(wallsV[ceil(col)], yTilt, xBounceFactor)) break;  
-      if (avoidWallsV(wallsV[floor(col)], yTilt, xBounceFactor)) break;   
+      if (showMaze) {
+        // narrow down the area where the ball currently is
+        float col = (ballPos.x - topLeft.x)/pathWidthH;
+        // adjust ball position to avoid the maze walls to the left and the right
+        if (avoidWallsV(wallsV[ceil(col)])) break;  
+        if (avoidWallsV(wallsV[floor(col)])) break;   
+      }
     }
     
     while (yMovement > 0) {
       // update ball position based on the tray's tilt in increments small enough not to miss a wall
-      float moveBy = (yMovement > innerFrameWidth/2) ? innerFrameWidth/2 : yMovement;
+      float moveBy = (yMovement > innerFrameWidth/3) ? innerFrameWidth/4 : yMovement;
       ballPos.y -= moveBy * yDirection;  
-      yMovement -= moveBy;;    
-      // ensure it stays within the tray area
+      yMovement -= moveBy;    
+      // ensure it stays within the tray area (even when the maze is turned off)
       ballPos.y = constrain(ballPos.y, topLeftBoundry.y, bottomRightBoundry.y );
-      // narrow down in area the ball currently is
-      float row = (ballPos.y - topLeft.y)/pathWidthV;
-      // adjust ball position to avoid the maze walls above and below 
-      if (avoidWallsH(wallsH[floor(row)], xTilt, yBounceFactor)) break;   
-      if (avoidWallsH(wallsH[ceil(row)], xTilt, yBounceFactor)) break;   
+      if (showMaze) {
+        // narrow down the area where the ball currently is
+        float row = (ballPos.y - topLeft.y)/pathWidthV;
+        // adjust ball position to avoid the maze walls above and below 
+        if (avoidWallsH(wallsH[floor(row)])) break;   
+        if (avoidWallsH(wallsH[ceil(row)])) break;   
+      }
     }
   }
 
@@ -279,7 +350,7 @@ class Maze {
   */
   
 
-  private boolean avoidWallsV(Wall[] walls, float yTilt, float bounceFactor) {
+  private boolean avoidWallsV(Wall[] walls) {
     boolean touchingWall = false;
     for (int w = 0; w < walls.length; w++) {
       Wall wall = walls[w];
@@ -287,14 +358,15 @@ class Maze {
         wall.highlight = true;
         // check left or right of wall, depending on tilt 
         //  and correct ballPos to keep the ball off the wall
-        if (yTilt >= 0 && ballPos.x >= wall.start.x - ballSize * .6     // ball rolling right & touching the left side of the wall
+        if (xSpeed >= 0 && ballPos.x >= wall.start.x - ballSize * .6     // ball rolling right & touching the left side of the wall
                           && ballPos.x <= wall.start.x) {
-          //ballPos.x = wall.start.x - ballSize *.6 - bounceFactor;  // TODO: works sort of, but makes the ball flicker back & forth
           ballPos.x = wall.start.x - ballSize *.6;
+          xSpeed = -xSpeed/4;
           touchingWall = true;
-        } else if (yTilt <= 0 && ballPos.x <= wall.start.x + ballSize * .8    // ball rolling left & touching right side of the wall
+        } else if (xSpeed <= 0 && ballPos.x <= wall.start.x + ballSize * .8    // ball rolling left & touching right side of the wall
                                && ballPos.x >= wall.start.x) {
           ballPos.x = wall.start.x + ballSize * .8;
+          xSpeed = -xSpeed/4;
           touchingWall = true;
           
         }
@@ -303,7 +375,7 @@ class Maze {
     return touchingWall;
   }
   
-  private boolean avoidWallsH(Wall[] walls, float xTilt, float bounceFactor) {
+  private boolean avoidWallsH(Wall[] walls) {
     boolean touchingWall = false;
     for (int w = 0; w < walls.length; w++) {
       Wall wall = walls[w];
@@ -311,13 +383,15 @@ class Maze {
         wall.highlight = true;
         // check top or bottom of wall, depending on tilt 
         //  and correct ballPos to keep the ball off the wall
-        if (xTilt <= 0 && ballPos.y >= wall.start.y - ballSize * .6
+        if (ySpeed <= 0 && ballPos.y >= wall.start.y - ballSize * .6
                           && ballPos.y <= wall.start.y) {
           ballPos.y = wall.start.y - ballSize *.6;
+          ySpeed = -ySpeed/4;
           touchingWall = true;
-        } else if (xTilt >= 0 && ballPos.y <= wall.start.y + ballSize * .8
+        } else if (ySpeed >= 0 && ballPos.y <= wall.start.y + ballSize * .8
                                && ballPos.y >= wall.start.y) {
           ballPos.y = wall.start.y + ballSize * .8;
+          ySpeed = -ySpeed/4;
           touchingWall = true;
         }
       } 
@@ -326,29 +400,44 @@ class Maze {
   }
 
  
-  private void drawMaze() {
+  private void drawMaze(float xTilt, float yTilt) {
+    
+    // draw the horizontal walls
     for (int row = 0; row < wallsH.length; row++) {
       Wall[] wallRow = wallsH[row];
       for (int wall = 0; wall < wallRow.length; wall++) {
-        wallRow[wall].display(innerFrameWidth, trayColors);
+        wallRow[wall].display(innerFrameWidth, trayColors, xTilt, yTilt);
       }
     }
     
+    // draw the vertical walls
     for (int col = 0; col < wallsV.length; col++) {
       Wall[] wallCol = wallsV[col];
       for (int wall = 0; wall < wallCol.length; wall++) {
-        wallCol[wall].display(innerFrameWidth, trayColors);
+        wallCol[wall].display(innerFrameWidth, trayColors, xTilt, yTilt);
       }
+    }
+    
+    // draw the goals
+    for (int i = 0; i < goals.length; i++) {
+      goals[i].display(); 
     }
     
   }
   
   
-  private void drawBall(Point pos) {
+  private void drawBall(Point pos, float xTilt, float yTilt) {
     pushMatrix();
+    // draw the ball shadow slightly offset depending on tray tilt 
+    translate(0, 0, 1);
+    fill(ballColors.get("shadow"));
+    noStroke();
+    ellipseMode(CENTER);
+    ellipse(pos.x + yTilt * 200, pos.y - xTilt * 200, ballSize, ballSize);  
+    // draw the actual ball
     translate(0, 0, 5);
     fill(ballColors.get("mainColor"));
-    stroke(ballColors.get("shadow"));
+    stroke(ballColors.get("shade"));
     strokeWeight(ballSize * .1);
     ellipse(pos.x, pos.y, ballSize, ballSize);  
     fill(ballColors.get("highlight"));

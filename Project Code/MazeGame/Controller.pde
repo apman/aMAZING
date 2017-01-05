@@ -8,21 +8,28 @@ class Controller {
   
   /* Functions *every* controler must implement: */
   
-  void update() {
-    
+  public void update() {
   }
 
   
-  /* Functions specific to KeyController: 
-     (for some reason functions only defined in the subclass seem invisible to the 
-       main code, even if you specifically reference a KeyController object) 
+  /* Functions specific to individual controllers: 
+     (for some reason I can't seem to cast the controller instances to their actual sub-class to get access to
+      functions only defined in the specific controler 
+      e.g.: (KeyController)keyController.keyAction();   gives an error, even though keyController IS a KeyController ..)
+      // TODO: find out why ...
   */
 
-  public void keyAction() { 
-  }
+  // KeyController and KinectController:    
+
+  public void keyAction() {}                                       // KeyController and KinectController    
   
-  public void keyReset() {  
-  }
+  public void keyReset() {}                                        // KeyController    
   
+  public boolean getCalibrationInProgress() { return false; }      // KinectController    
+
+  public void calibrate() {}                                       // KinectController
   
+  public boolean getCameraAdjustmentInProgress() { return false; }      // KinectController  
+  
+  public void setCameraAdjustmentInProgress(boolean onOff) {}      // KinectController  
 }
