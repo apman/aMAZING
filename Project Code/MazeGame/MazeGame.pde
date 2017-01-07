@@ -107,10 +107,12 @@ void drawMenu() {
   if (currentController == kinectController) {
     drawButton("Calibrate", width-180, 420, !kinectController.getCalibrationInProgress());  // TODO: make the boolean dynamic
     // Draw camera tilt instructions
-    cameraInstructions = "Press UP / DOWN\nto adjust the\ncamera angle\n\n";
+    cameraInstructions = "Press UP / DOWN\nto adjust the\ncamera angle,\n'i' for info,\n'd' for debug lines,\n any key to exit camera screen\n";
     
     
   }
+  String generalInstructions = "Click anywhere to show the menu at any time.";
+  String instructions = (currentController == kinectController) ? cameraInstructions : generalInstructions;
   
   rectMode(CORNER);
   fill(120);
@@ -118,7 +120,7 @@ void drawMenu() {
   rect(width-180, 500, 160, 180);
   fill(255);
   textSize(14);
-  text(cameraInstructions + "Click anywhere to show the menu at any time.", width-170, 520, 140, 160);
+  text(instructions, width-170, 520, 140, 160);
   popMatrix();
 }
 

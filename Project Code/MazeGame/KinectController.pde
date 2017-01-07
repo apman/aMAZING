@@ -21,15 +21,16 @@ class KinectController extends Controller {
   int relevantPoints;
   
   // default values - will be adjusted by calibration
-  int minXWeight = 100;
-  int maxXWeight = 500;
-  int minYWeight = 20;
-  int maxYWeight = 80;
+  int minXWeight = -300;
+  int maxXWeight = -100;
+  int minYWeight = 70;
+  int maxYWeight = 90;
  
   
   boolean calibrationInProgress = false;
   int calibrationStart;
   boolean cameraAdjustmentInProgress = false;
+  boolean showXYWeightLines = false;
   
   
 
@@ -62,14 +63,14 @@ class KinectController extends Controller {
     
     
     // reset current thresholds 
-    minXWeight = 9999;
-    maxXWeight = 0;
-    minYWeight = 9999;
-    maxYWeight = 0;
+    minXWeight = 9999999;
+    maxXWeight = -9999999;
+    minYWeight = 9999999;
+    maxYWeight = -9999999;
   }
   
   
-  private void showCameraScreen() {
+  private void showCameraScreen(boolean showInfo) {
     
     // set the board level (just so the corners don't stick up through calibration screen)
     xTilt = 0;
@@ -83,13 +84,50 @@ class KinectController extends Controller {
     rect(0, 0, width, height);
     imageMode(CENTER);
     image(img, width/2, height/2);  // display depth image    
+    
+    if (showInfo) {
+      showXYWeightLines = true;
+      displayCalibrationData(LEFT);
+      displayCalibrationData(RIGHT);
+      displayCalibrationData(TOP);
+      displayCalibrationData(BOTTOM);
+    }
+    
     popMatrix();
   }
+  
+
+  private void displayXYWeightLines() {
+    
+    pushMatrix();
+    translate(0, 0, 45);
+    noStroke();
+    rectMode(CENTER);
+    
+    // draw center lines as reference point
+    fill(0, 255, 0);
+    rect(width/2, height/2, width, 1);
+    rect(width/2, height/2, 1, height);
+    
+    // draw moving lines to indicate current weight center    
+    float xPos = map(xWeight, minXWeight, maxXWeight, 0, width);  
+    float yPos = map(yWeight, minYWeight, maxYWeight, 0, height);   
+    //println( + " / " + (int)xPos
+    xPos = 10 * round(xPos/10);  // make it a little less jumpy by rounding
+    yPos = 10 * round(yPos/10);  // make it a little less jumpy by rounding
+    xPos = constrain(xPos, 30, width-30);
+    yPos = constrain(yPos, 30, height-30);
+    fill(255, 0, 0);
+    rect(width/2, yPos, width, 1);
+    rect(xPos, height/2, 1, height);
+    popMatrix();
+  }
+
   
   private void runCalibration() {
     
     // show calibration screen
-    showCameraScreen();
+    showCameraScreen(false);
 
     pushMatrix();
     translate(0, 0, 40);
@@ -117,11 +155,15 @@ class KinectController extends Controller {
       displayCalibrationData(BOTTOM);
       if (yWeight > maxYWeight) maxYWeight = yWeight;
     } else {
-      calibrationInProgress = false;
-    }
+      showXYWeightLines = true;
+      displayCalibrationData(LEFT);
+      displayCalibrationData(RIGHT);
+      displayCalibrationData(TOP);
+      displayCalibrationData(BOTTOM);      
+    } 
+   
     popMatrix();
-    
-    
+        
     updateTilt();
   }
   
@@ -138,7 +180,7 @@ class KinectController extends Controller {
   private void displayCalibrationData(int dir) {
     fill(255);
     textAlign(CENTER);
-    textSize(45);
+    textSize(25);  // TEMP SHOOULD BE 45
     int currentWeight = (dir == LEFT || dir == RIGHT) ? xWeight : yWeight;
     int threshold = (dir == LEFT) ? minXWeight : (dir == RIGHT) ? maxXWeight : (dir == TOP) ? minYWeight : maxYWeight;
     int x = (dir == TOP || dir == BOTTOM) ? width/2 : (dir == LEFT) ? (width - 640)/4 : width - (width - 640)/4 ;
@@ -158,7 +200,10 @@ class KinectController extends Controller {
     }
     
     if (cameraAdjustmentInProgress) {
-      showCameraScreen();
+      showCameraScreen(true);
+    } 
+    if (showXYWeightLines) {
+      displayXYWeightLines(); 
     }
   }
   
@@ -174,13 +219,16 @@ class KinectController extends Controller {
          int index = row * img.width + col;
          int currentPix = img.pixels[index];
          if (brightness(currentPix) > 0 && hue(currentPix) < 100) {  // ignore black and blue pixels
-           totalXWeight += col;     // for left/right movement each valid colour counts the same, but the further right the pixel the more it counts  
+           totalXWeight += - width/2 + col;     // for left/right movement each valid colour counts the same, but the further right
+                                                 //  a pixel the more it counts, center counts 0, left of center negative  
            totalYWeight += hue(currentPix);  // for front/back movement red pixels count most, then yellow, and green the least
            relevantPoints++;
          }
       }
     }
     if (relevantPoints > 0) {
+      //xWeight = (int)totalXWeight/relevantPoints;
+      //yWeight = (int)totalYWeight/relevantPoints;
       xWeight = (int)totalXWeight/relevantPoints;
       yWeight = (int)totalYWeight/relevantPoints;
     }
@@ -189,17 +237,21 @@ class KinectController extends Controller {
       // translate depth-image data to tray tilt angles between ~ -3 and 3 degrees (in rad)
       yTilt = map(xWeight, minXWeight, maxXWeight, -0.05, 0.05);  
       xTilt = map(yWeight, maxYWeight, minYWeight, -0.05, 0.05);
-      yTilt = constrain(yTilt, -0.06, 0.06); 
-      xTilt = constrain(xTilt, -0.06, 0.06); 
+      yTilt = constrain(yTilt, -0.05, 0.05); 
+      xTilt = constrain(xTilt, -0.05, 0.05); 
     }
 
-    // println(xWeight + " / " + yWeight + " (" + relevantPoints + " points)");
+    println(xWeight + " / " + yWeight + " (" + relevantPoints + " points)");
 
   }
   
   public void keyAction() {
   
-    if (key == CODED) {
+    if (key == 'd') {
+      showXYWeightLines = true;
+    } else if (key == 'i') {
+      cameraAdjustmentInProgress = true;
+    } else if (key == CODED) {
       if (keyCode == UP) {
         deg++;
       } else if (keyCode == DOWN) {
@@ -209,7 +261,9 @@ class KinectController extends Controller {
       kinect.setTilt(deg);
       cameraAdjustmentInProgress = true;
     } else {
-      cameraAdjustmentInProgress = false;
+      cameraAdjustmentInProgress = false;   // ie. hit any non-coded key to dismiss the camera image
+      showXYWeightLines = false;
+      calibrationInProgress = false;
     }
     
   }
