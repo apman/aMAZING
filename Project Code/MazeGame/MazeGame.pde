@@ -25,11 +25,16 @@ boolean showInfo = false;
 int infoTurnedOnAt = 0;
 int displayTimeout = 10000;
 
+// maze Layouts
+final MazeLayout defaultMaze = new DefaultMaze();
+final MazeLayout soccerLayout = new SoccerLayout();
+MazeLayout currentLayout = defaultMaze;                  // TODO: create a UI to switch to soccer mode
+
 
 void setup() {
   size(1000, 800, P3D);
   frameRate(30);
-  maze = new Maze(width, height);
+  maze = new Maze(width, height, currentLayout);
   
   background(50);
   turnOnMenu();
