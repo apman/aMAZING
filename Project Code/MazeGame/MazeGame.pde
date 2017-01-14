@@ -21,7 +21,9 @@ Controller currentController = mouseController;
 
 boolean showMenu = false;
 int menuTurnedOnAt = 0;
-int menuTimeout = 10000;
+boolean showInfo = false;
+int infoTurnedOnAt = 0;
+int displayTimeout = 10000;
 
 
 void setup() {
@@ -38,7 +40,14 @@ void draw() {
   if (showMenu) {
     drawMenu();
     // timeout for the menu
-    if (millis() - menuTurnedOnAt > menuTimeout) showMenu = false;
+    if (millis() - menuTurnedOnAt > displayTimeout) showMenu = false;
+  }
+  
+  // Info panel
+  if (showInfo) {
+    drawInfoBar();
+    // timeout for the menu
+    if (millis() - infoTurnedOnAt > displayTimeout) showInfo = false;
   }
   
   // Maze
@@ -78,7 +87,36 @@ void keyPressed() {
                           // any other keys, might as well turn the menu off on any key ...
 
   if (currentController == keyController) keyController.keyAction();
-  if (currentController == kinectController) kinectController.keyAction();  
+  else if (currentController == kinectController) kinectController.keyAction();  
+  else {
+    // adjust ball speed
+    switch (key) {
+      case ',': 
+        maze.adjustAcceleration("down");
+        turnOnInfo();
+        break;
+      case '.':
+        maze.adjustAcceleration("up");
+        turnOnInfo();
+        break;
+      case 'n':
+        maze.adjustUpHillGravity("down");
+        turnOnInfo();
+        break;
+      case 'm':
+        maze.adjustUpHillGravity("up");
+        turnOnInfo();
+        break;
+      case 'v':
+        maze.adjustBounce("down");
+        turnOnInfo();
+        break;
+      case 'b':
+        maze.adjustBounce("up");
+        turnOnInfo();
+        break;
+    }
+  }
 }
 
 void keyReleased() {
@@ -91,6 +129,11 @@ void keyReleased() {
 void turnOnMenu() {
   showMenu = true;
   menuTurnedOnAt = millis(); 
+}
+
+void turnOnInfo() {
+  showInfo = true;
+  infoTurnedOnAt = millis(); 
 }
 
 void drawMenu() {
@@ -108,10 +151,10 @@ void drawMenu() {
     drawButton("Calibrate", width-180, 420, !kinectController.getCalibrationInProgress());  // TODO: make the boolean dynamic
     // Draw camera tilt instructions
     cameraInstructions = "Press UP / DOWN\nto adjust the\ncamera angle,\n'i' for info,\n'd' for debug lines,\n any key to exit camera screen\n";
-    
-    
   }
-  String generalInstructions = "Click anywhere to show the menu at any time.";
+  
+  // show instructions
+  String generalInstructions = "Click anywhere to show the menu at any time.\n</> to adjust bounce\n,/. to adjust speed";
   String instructions = (currentController == kinectController) ? cameraInstructions : generalInstructions;
   
   rectMode(CORNER);
@@ -123,6 +166,25 @@ void drawMenu() {
   text(instructions, width-170, 520, 140, 160);
   popMatrix();
 }
+
+void drawInfoBar() {
+  pushMatrix();
+  translate(-60, 60, 50);
+  // info
+  String info = "Acceleration factor: " + maze.getAccelerationFactor() +       
+                "      Bounce factor: " + maze.getBounceFactor() + 
+                "      Uphill-Gravity factor: " + maze.getUpHillGravityFactor();
+  
+  rectMode(CENTER);
+  fill(120);
+  stroke(90);
+  rect(width/2, height-150, width-380, 30);
+  fill(255);
+  textSize(14);
+  text(info, width/2, height-150, width-400, 20);
+  popMatrix();
+}
+
 
 void drawButton(String label, int x, int y, boolean active) {
   color fillColor = (active) ? 210 : 80;
@@ -159,6 +221,7 @@ void mouseClicked() {
       kinectController.setCameraAdjustmentInProgress(false);
     } else {
       turnOnMenu();
+      turnOnInfo();
     }
   }
 }
