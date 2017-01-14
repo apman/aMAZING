@@ -26,6 +26,12 @@ class Maze {
   private float xSpeed = 0;
   private float ySpeed = 0;
   private float accelerationFactor = 4;
+  private float accelerationFactorSteps = .5;
+  private float bounceFactor = .5;
+  private float bounceFactorSteps = .1;
+  private float upHillGravityFactor = 3;
+  private float upHillGravityFactorSteps = .3;
+
   
   // option to only show a blank tray with the ball rolling (good for calibration)
   boolean showMaze = true;
@@ -289,8 +295,16 @@ class Maze {
   
   private void setBallPos(float xTilt, float yTilt) {
     
-    xSpeed += yTilt * accelerationFactor;  // negative tilt -> ball rolls left
-    ySpeed += xTilt * accelerationFactor;  // negative tilt -> ball rolls down
+    
+    // The uphillGravity factor kicks in whenever the tilt changes into the opposite direction to help the ball 
+    //  to turn around  faster (not quite sure what the proper physics would be (seeing that acceleration is already
+    //  a product of gravity, but the animation does seem a bit more natural with a little bit of extra pull to
+    //  stop the ball from rolling uphill too far.
+    float gravityFactor = ((xSpeed > 0 && yTilt < 0) || (xSpeed < 0 && yTilt > 0)) ? upHillGravityFactor : 1;
+    xSpeed += yTilt * accelerationFactor * gravityFactor;  // negative tilt -> ball rolls left
+    
+    gravityFactor = ((ySpeed > 0 && xTilt < 0) || (ySpeed < 0 && xTilt > 0)) ? upHillGravityFactor : 1;
+    ySpeed += xTilt * accelerationFactor * gravityFactor;  // negative tilt -> ball rolls down
     
     float xMovement = xSpeed;
     float yMovement = ySpeed;
@@ -361,12 +375,12 @@ class Maze {
         if (xSpeed >= 0 && ballPos.x >= wall.start.x - ballSize * .6     // ball rolling right & touching the left side of the wall
                           && ballPos.x <= wall.start.x) {
           ballPos.x = wall.start.x - ballSize *.6;
-          xSpeed = -xSpeed/4;
+          xSpeed = -xSpeed * bounceFactor;
           touchingWall = true;
         } else if (xSpeed <= 0 && ballPos.x <= wall.start.x + ballSize * .8    // ball rolling left & touching right side of the wall
                                && ballPos.x >= wall.start.x) {
           ballPos.x = wall.start.x + ballSize * .8;
-          xSpeed = -xSpeed/4;
+          xSpeed = -xSpeed * bounceFactor;
           touchingWall = true;
           
         }
@@ -386,12 +400,12 @@ class Maze {
         if (ySpeed <= 0 && ballPos.y >= wall.start.y - ballSize * .6
                           && ballPos.y <= wall.start.y) {
           ballPos.y = wall.start.y - ballSize *.6;
-          ySpeed = -ySpeed/4;
+          ySpeed = -ySpeed * bounceFactor;
           touchingWall = true;
         } else if (ySpeed >= 0 && ballPos.y <= wall.start.y + ballSize * .8
                                && ballPos.y >= wall.start.y) {
           ballPos.y = wall.start.y + ballSize * .8;
-          ySpeed = -ySpeed/4;
+          ySpeed = -ySpeed * bounceFactor;
           touchingWall = true;
         }
       } 
@@ -446,4 +460,33 @@ class Maze {
     popMatrix();
   }
   
+  public void adjustAcceleration(String upDown) {
+    accelerationFactor += (upDown == "up") ? accelerationFactorSteps : -accelerationFactorSteps; 
+    accelerationFactor = constrain(accelerationFactor, 1, 10);
+  }
+  
+  public void adjustUpHillGravity(String upDown) {
+    upHillGravityFactor += (upDown == "up") ? upHillGravityFactorSteps : -upHillGravityFactorSteps; 
+    upHillGravityFactor = constrain(upHillGravityFactor, 1, 6);
+  }
+  
+  public void adjustBounce(String upDown) {
+    bounceFactor += (upDown == "up") ? bounceFactorSteps : -bounceFactorSteps; 
+    bounceFactor = constrain(bounceFactor, .1, .9);
+  }
+  
+  public float getAccelerationFactor() {
+    println("Acc: " + accelerationFactor);
+    return (float)(round(accelerationFactor*10))/10;
+  }
+  
+  public float getUpHillGravityFactor() {
+    println("Grav: " + upHillGravityFactor);
+    return (float)(round(upHillGravityFactor*10))/10;
+  }
+  
+  public float getBounceFactor() {
+    println("Bounce: " + bounceFactor);
+    return (float)(round(bounceFactor*100))/100;
+  }
 }
