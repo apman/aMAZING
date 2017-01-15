@@ -55,6 +55,8 @@ class Maze {
    int[][] goalCoords = {{5,5},{7,1},{10,8}};
    Goal[] goals = new Goal[goalCoords.length]; 
    
+   String layoutType; 
+   
  
  
   Maze(int _boxWidth, int _boxHeight, MazeLayout layout) {
@@ -92,7 +94,10 @@ class Maze {
     pathWidthH = optimalPathWidth(trayWidth);
     pathWidthV = optimalPathWidth(trayHeight); 
     
+    layoutType = (layout instanceof DefaultMaze) ? "maze" : "soccer";   
+    
     createGoals();
+    
     createWalls(layout);
   }
   
@@ -148,19 +153,22 @@ class Maze {
   }
   
   void createGoals() {
-    for (int i=0; i < goalCoords.length; i++) {
-      goals[i] = new Goal(int(pathWidthH));
-      goals[i].pos = new Point(topLeft.x + 5 + goalCoords[i][0] * pathWidthH + pathWidthH/2, 
-                          topLeft.y + 5 + goalCoords[i][1] * pathWidthV + pathWidthV/2);
+    if (layoutType == "maze") {
+      for (int i=0; i < goalCoords.length; i++) {
+        goals[i] = new Goal(int(pathWidthH));
+        goals[i].pos = new Point(topLeft.x + 5 + goalCoords[i][0] * pathWidthH + pathWidthH/2, 
+                            topLeft.y + 5 + goalCoords[i][1] * pathWidthV + pathWidthV/2);
+      }
+      /* NOTE: the ' + 5 ' above is to adjust the goal marker positions to the moved maze 
+                cp. the hack in createWalls() */
     }
-    /* NOTE: the ' + 5 ' above is to adjust the goal marker positions to the moved maze 
-              cp. the hack in createWalls() */
-    
   }
   
   public void resetGoals() {
-    for (int i=0; i < goals.length; i++) {
-      goals[i].found = false; 
+    if (layoutType == "maze") {   
+      for (int i=0; i < goals.length; i++) {
+        goals[i].found = false; 
+      }
     }
   }
   
@@ -261,11 +269,12 @@ class Maze {
   
   
   private void checkIfGoalIsReached() {
-    // check if the ball has reached one of the goals
-    for (int i = 0; i < goals.length; i++) {
-      goals[i].checkIfFound(ballPos); 
+    if (layoutType == "maze") { 
+      // check if the ball has reached one of the goals
+      for (int i = 0; i < goals.length; i++) {
+        goals[i].checkIfFound(ballPos); 
+      }
     }
-    
   }
 
   
@@ -409,10 +418,11 @@ class Maze {
     }
     
     // draw the goals
-    for (int i = 0; i < goals.length; i++) {
-      goals[i].display(); 
+    if (layoutType == "maze") { 
+      for (int i = 0; i < goals.length; i++) {
+        goals[i].display(); 
+      }
     }
-    
   }
   
   
