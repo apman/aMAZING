@@ -116,19 +116,19 @@ void keyPressed() {
         maze.adjustAcceleration("up");
         turnOnInfo();
         break;
-      case 'n':
+      case 'v':
         maze.adjustUpHillGravity("down");
         turnOnInfo();
         break;
-      case 'm':
+      case 'b':
         maze.adjustUpHillGravity("up");
         turnOnInfo();
         break;
-      case 'v':
+      case 'n':
         maze.adjustBounce("down");
         turnOnInfo();
         break;
-      case 'b':
+      case 'm':
         maze.adjustBounce("up");
         turnOnInfo();
         break;
@@ -179,7 +179,7 @@ void drawMenu() {
   }
   
   // show instructions
-  String generalInstructions = "Click anywhere to show the menu at any time.\n</> to adjust bounce\n,/. to adjust speed";
+  String generalInstructions = "Click anywhere to show the menu.\n\nAdjustment keys:\nacceleration: ,/.\nbounce: n/m\n'uphillGravity': v/b";
   String instructions = (currentController == kinectController) ? cameraInstructions : generalInstructions;
   
   rectMode(CORNER);
