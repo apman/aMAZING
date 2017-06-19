@@ -48,30 +48,6 @@ class Maze {
   //       grid ... (oops, I think I already did that (so it should work with a square now 
   //       TODO: ^ try and document properly
   
-  int[][][] wallEdgesH = {{{0,12}},            
-                          {{3,5},{6,7},{9,11}}, 
-                          {{0,2},{5,6},{7,8}},
-                          {{4,5},{7,9},{10,12}},
-                          {{1,3},{4,5},{6,8},{9,10}},
-                          {{2,4},{5,6},{8,9}},
-                          {{1,2},{4,6},{7,8},{10,11}},
-                          {{0,1},{6,7},{10, 12}},
-                          {{1,2},{7,8},{10, 11}},
-                          {{2,3},{4,5},{7,9},{10,11}},
-                          {{0,12}}};
-  int[][][] wallEdgesV = {{{0,10}},            
-                          {{0,1},{3,6},{8,9}}, 
-                          {{1,3},{6,8}},
-                          {{1,3},{5,9}},
-                          {{2,3},{6,8},{9,10}},
-                          {{1,2},{4,6},{7,9}},
-                          {{0,1},{2,3},{4,5},{6,9}},
-                          {{1,2},{5,6},{9,10}},
-                          {{1,2},{4,5},{6,8}},
-                          {{1,3},{6,8}},
-                          {{3,5}},
-                          {{1,2},{4,6},{8,9}},
-                          {{0,10}}};
    
    Wall[][] wallsH = new Wall[0][0];    // array of rows of horizontal walls
    Wall[][] wallsV = new Wall[0][0];    // array of columns of vertical walls
@@ -79,9 +55,11 @@ class Maze {
    int[][] goalCoords = {{5,5},{7,1},{10,8}};
    Goal[] goals = new Goal[goalCoords.length]; 
    
+   String layoutType; 
+   
  
  
-  Maze(int _boxWidth, int _boxHeight) {
+  Maze(int _boxWidth, int _boxHeight, MazeLayout layout) {
     
     // -- set colours: --
     // outer box frame
@@ -116,22 +94,25 @@ class Maze {
     pathWidthH = optimalPathWidth(trayWidth);
     pathWidthV = optimalPathWidth(trayHeight); 
     
+    layoutType = (layout instanceof DefaultMaze) ? "maze" : "soccer";   
+    
     createGoals();
-    createWalls();
+    
+    createWalls(layout);
   }
   
-  void createWalls() {
+  void createWalls(MazeLayout layout) {
 
     // Convert the conceptual edges (as in edges of a graph) from simple coordinates to  
     //  Wall objects with pre-calculated pixel positions
       
-    for (int row = 0; row < wallEdgesH.length; row++) {
-      int[][] wallRow = wallEdgesH[row];
+    for (int row = 0; row < layout.wallEdgesH.length; row++) {
+      int[][] wallRow = layout.wallEdgesH[row];
       Wall[] walls = new Wall[0];
       String type = "maze";
       if (row == 0) {
         type = "topFrame";
-      } else if (row == wallEdgesH.length - 1) {
+      } else if (row == layout.wallEdgesH.length - 1) {
         type = "bottomFrame";
       } 
          // ^^ outside walls are invisible so they don't interfere with the rounded edges of the frame,
@@ -149,13 +130,13 @@ class Maze {
     /* NOTE: the ' + 5 ' above and below is to push the slightly shrunk maze (cp. the hack in optimalPathWidth() )
              down & right a bit, so that the rounded ends of the maze walls don't stick out beyond the frame */
     
-   for (int col = 0; col < wallEdgesV.length; col++) {
-      int[][] wallCol = wallEdgesV[col];
+   for (int col = 0; col < layout.wallEdgesV.length; col++) {
+      int[][] wallCol = layout.wallEdgesV[col];
       Wall[] walls = new Wall[0];
       String type = "maze";
       if (col == 0) {
         type = "leftFrame";
-      } else if (col == wallEdgesV.length - 1) {
+      } else if (col == layout.wallEdgesV.length - 1) {
         type = "rightFrame";
       } 
          // ^^ outside walls are invisible so they don't interfere with the rounded edges of the frame,
@@ -172,19 +153,22 @@ class Maze {
   }
   
   void createGoals() {
-    for (int i=0; i < goalCoords.length; i++) {
-      goals[i] = new Goal(int(pathWidthH));
-      goals[i].pos = new Point(topLeft.x + 5 + goalCoords[i][0] * pathWidthH + pathWidthH/2, 
-                          topLeft.y + 5 + goalCoords[i][1] * pathWidthV + pathWidthV/2);
+    if (layoutType == "maze") {
+      for (int i=0; i < goalCoords.length; i++) {
+        goals[i] = new Goal(int(pathWidthH));
+        goals[i].pos = new Point(topLeft.x + 5 + goalCoords[i][0] * pathWidthH + pathWidthH/2, 
+                            topLeft.y + 5 + goalCoords[i][1] * pathWidthV + pathWidthV/2);
+      }
+      /* NOTE: the ' + 5 ' above is to adjust the goal marker positions to the moved maze 
+                cp. the hack in createWalls() */
     }
-    /* NOTE: the ' + 5 ' above is to adjust the goal marker positions to the moved maze 
-              cp. the hack in createWalls() */
-    
   }
   
   public void resetGoals() {
-    for (int i=0; i < goals.length; i++) {
-      goals[i].found = false; 
+    if (layoutType == "maze") {   
+      for (int i=0; i < goals.length; i++) {
+        goals[i].found = false; 
+      }
     }
   }
   
@@ -285,11 +269,12 @@ class Maze {
   
   
   private void checkIfGoalIsReached() {
-    // check if the ball has reached one of the goals
-    for (int i = 0; i < goals.length; i++) {
-      goals[i].checkIfFound(ballPos); 
+    if (layoutType == "maze") { 
+      // check if the ball has reached one of the goals
+      for (int i = 0; i < goals.length; i++) {
+        goals[i].checkIfFound(ballPos); 
+      }
     }
-    
   }
 
   
@@ -433,10 +418,11 @@ class Maze {
     }
     
     // draw the goals
-    for (int i = 0; i < goals.length; i++) {
-      goals[i].display(); 
+    if (layoutType == "maze") { 
+      for (int i = 0; i < goals.length; i++) {
+        goals[i].display(); 
+      }
     }
-    
   }
   
   

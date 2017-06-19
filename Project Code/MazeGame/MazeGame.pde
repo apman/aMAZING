@@ -1,7 +1,6 @@
 import org.openkinect.freenect.*;
-//import org.openkinect.freenect2.*;
 import org.openkinect.processing.*;
-//import org.openkinect.tests.*;
+
 
 
 Maze maze;
@@ -21,15 +20,25 @@ Controller currentController = mouseController;
 
 boolean showMenu = false;
 int menuTurnedOnAt = 0;
+//<<<<<<< HEAD
 boolean showInfo = false;
 int infoTurnedOnAt = 0;
 int displayTimeout = 10000;
+//=======
+//int menuTimeout = 15000;
+//>>>>>>> add a button to switch between maze and soccer
+
+// maze Layouts
+final MazeLayout defaultMaze = new DefaultMaze();
+final MazeLayout soccerLayout = new SoccerLayout();
+MazeLayout currentLayout = defaultMaze;                  // TODO: create a UI to switch to soccer mode
+
 
 
 void setup() {
   size(1000, 800, P3D);
   frameRate(30);
-  maze = new Maze(width, height);
+  setMaze();
   
   background(50);
   turnOnMenu();
@@ -40,6 +49,7 @@ void draw() {
   if (showMenu) {
     drawMenu();
     // timeout for the menu
+//<<<<<<< HEAD
     if (millis() - menuTurnedOnAt > displayTimeout) showMenu = false;
   }
   
@@ -48,6 +58,9 @@ void draw() {
     drawInfoBar();
     // timeout for the menu
     if (millis() - infoTurnedOnAt > displayTimeout) showInfo = false;
+//=======
+//    if (millis() - menuTurnedOnAt > menuTimeout) hideMenu();
+//>>>>>>> add a button to switch between maze and soccer
   }
   
   // Maze
@@ -55,6 +68,10 @@ void draw() {
   maze.display(currentController.xTilt, currentController.yTilt);
 }
 
+
+void setMaze() {
+  maze = new Maze(width, height, currentLayout);
+}
 
 void setCurrentControler(String controlerType) {
   switch (controlerType) {
@@ -83,7 +100,7 @@ void setCurrentControler(String controlerType) {
 
 void keyPressed() {
   
-  showMenu = false;    // (should really just happen if UP/DOWN are clicked, but since there is no reason to click
+  hideMenu();    // (should really just happen if UP/DOWN are clicked, but since there is no reason to click
                           // any other keys, might as well turn the menu off on any key ...
 
   if (currentController == keyController) keyController.keyAction();
@@ -131,18 +148,26 @@ void turnOnMenu() {
   menuTurnedOnAt = millis(); 
 }
 
+//<<<<<<< HEAD
 void turnOnInfo() {
   showInfo = true;
   infoTurnedOnAt = millis(); 
+}
+//=======
+void hideMenu() {
+  showMenu = false;
+//>>>>>>> add a button to switch between maze and soccer
 }
 
 void drawMenu() {
   pushMatrix();
   translate(-60, 60, 50);
+  
   drawButton("Use Mouse", width-180, 20, currentController != mouseController);
   drawButton("Use Keys", width-180, 100, currentController != keyController);
   drawButton("Use Kinect", width-180, 180, currentController != kinectController);
-  drawButton("Hide Maze", width-180, 260, maze.showMaze == true);
+  String gameChoice = (currentLayout == defaultMaze) ? "Foozball" : "Maze";
+  drawButton(gameChoice, width-180, 260, maze.showMaze == true);
   drawButton("New Game", width-180, 340, true);
   
   // Kinect specific stuff
@@ -209,12 +234,16 @@ void mouseClicked() {
     } else if (mouseX >= width-240 && mouseY > 220  && mouseY < 300) {
       setCurrentControler(KINECT);
     } else if (mouseX >= width-240 && mouseY > 310  && mouseY < 390) {
-      maze.showMaze = !maze.showMaze;
+      //maze.showMaze = !maze.showMaze;
+      currentLayout = (currentLayout == defaultMaze) ? soccerLayout : defaultMaze;
+      setMaze();
     } else if (mouseX >= width-240 && mouseY > 400  && mouseY < 480) {
       maze.resetGoals();
     } else if (mouseX >= width-240 && mouseY > 490  && mouseY < 570 && currentController == kinectController) {
       kinectController.calibrate();
-      showMenu = false;
+      hideMenu();
+    } else {
+      hideMenu();
     }
   } else {
     if (currentController == kinectController && kinectController.getCameraAdjustmentInProgress()) {
