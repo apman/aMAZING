@@ -52,7 +52,7 @@ class Maze {
    Wall[][] wallsH = new Wall[0][0];    // array of rows of horizontal walls
    Wall[][] wallsV = new Wall[0][0];    // array of columns of vertical walls
    
-   int[][] goalCoords = {{5,5},{7,1},{10,8}};
+   int[][] goalCoords = {{1,6},{4,2},{4,9},{5,5},{7,1},{10,8},{11,5}};
    Goal[] goals = new Goal[goalCoords.length]; 
    
    String layoutType; 
