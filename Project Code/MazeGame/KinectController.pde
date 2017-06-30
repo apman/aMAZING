@@ -21,10 +21,10 @@ class KinectController extends Controller {
   int relevantPoints;
   
   // default values - will be adjusted by calibration
-  int minXWeight = -300;
-  int maxXWeight = -100;
-  int minYWeight = 70;
-  int maxYWeight = 90;
+  int minXWeight = -351; // -300;   // LEFT
+  int maxXWeight = -20;  // -100;   // RIGHT
+  int minYWeight = 6;    //  70;    // TOP
+  int maxYWeight = 74;   //  90;    // BOTTOM
  
   
   boolean calibrationInProgress = false;
@@ -246,6 +246,7 @@ class KinectController extends Controller {
   }
   
   public void keyAction() {
+    // TODO: show these keys in the UI (especially how to get out of the camera view)
   
     if (key == 'd') {
       showXYWeightLines = true;
