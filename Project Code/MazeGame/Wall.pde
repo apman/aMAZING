@@ -4,7 +4,7 @@ class Wall {
   public Point end;
   private String type;
   
-  // temp var for debugging
+  // temp var for debugging (turn on to see which walls are actively watching out for the ball at any time)
   public boolean highlight = false;
   
   

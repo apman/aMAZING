@@ -20,18 +20,15 @@ Controller currentController = mouseController;
 
 boolean showMenu = false;
 int menuTurnedOnAt = 0;
-//<<<<<<< HEAD
 boolean showInfo = false;
 int infoTurnedOnAt = 0;
 int displayTimeout = 10000;
-//=======
-//int menuTimeout = 15000;
-//>>>>>>> add a button to switch between maze and soccer
+
 
 // maze Layouts
-final MazeLayout defaultMaze = new DefaultMaze();
-final MazeLayout soccerLayout = new SoccerLayout();
-MazeLayout currentLayout = defaultMaze;                  // TODO: create a UI to switch to soccer mode
+final GameLayout defaultMaze = new DefaultMaze();
+final GameLayout soccerLayout = new SoccerLayout();
+GameLayout currentLayout = defaultMaze;                
 
 
 
@@ -49,7 +46,6 @@ void draw() {
   if (showMenu) {
     drawMenu();
     // timeout for the menu
-//<<<<<<< HEAD
     if (millis() - menuTurnedOnAt > displayTimeout) showMenu = false;
   }
   
@@ -58,9 +54,6 @@ void draw() {
     drawInfoBar();
     // timeout for the menu
     if (millis() - infoTurnedOnAt > displayTimeout) showInfo = false;
-//=======
-//    if (millis() - menuTurnedOnAt > menuTimeout) hideMenu();
-//>>>>>>> add a button to switch between maze and soccer
   }
   
   // Maze

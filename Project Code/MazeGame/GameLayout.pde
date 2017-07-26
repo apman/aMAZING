@@ -1,4 +1,4 @@
-class MazeLayout {
+class GameLayout {
   
   int[][][] wallEdgesH;
   int[][][] wallEdgesV;

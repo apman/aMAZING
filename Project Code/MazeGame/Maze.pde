@@ -40,8 +40,8 @@ class Maze {
   // maze walls
   
   // NOTE: the zero & last row/column *could* be used to draw the tray edge 
-  //        but probably not worth changing (could be complicated to get the 
-  //        rounded corners
+  //        but to get the rounded corners the actual (bounce) walls are invisible
+  //        and the visible wall is drawn separately
   // 
   // TODO: maybe make a grid that is wider than the current square tray and then 
   //       depending on how many channels fit onto the tray, use only part of the 
@@ -59,7 +59,7 @@ class Maze {
    
  
  
-  Maze(int _boxWidth, int _boxHeight, MazeLayout layout) {
+  Maze(int _boxWidth, int _boxHeight, GameLayout layout) {
     
     // -- set colours: --
     // outer box frame
@@ -101,7 +101,7 @@ class Maze {
     createWalls(layout);
   }
   
-  void createWalls(MazeLayout layout) {
+  void createWalls(GameLayout layout) {
 
     // Convert the conceptual edges (as in edges of a graph) from simple coordinates to  
     //  Wall objects with pre-calculated pixel positions
@@ -339,15 +339,7 @@ class Maze {
       }
     }
   }
-
-  
-  /* TODO: to implement bounce there are a few things that would need to be done: 
-           * implement a more realistic acceleration (because the ball's speed only hinges on the tilt, 
-              it will come back to the wall after a bounce just as fast as it did initially)
-           * remove the 'constrain' that keeps the ball within the tray (in setBallPos()) and implement 
-              the outer walls as walls (would need some condition to stop them actually being drawn)
-  */
-  
+ 
 
   private boolean avoidWallsV(Wall[] walls) {
     boolean touchingWall = false;
