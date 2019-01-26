@@ -42,12 +42,6 @@ class Maze {
   // NOTE: the zero & last row/column *could* be used to draw the tray edge 
   //        but to get the rounded corners the actual (bounce) walls are invisible
   //        and the visible wall is drawn separately
-  // 
-  // TODO: maybe make a grid that is wider than the current square tray and then 
-  //       depending on how many channels fit onto the tray, use only part of the 
-  //       grid ... (oops, I think I already did that (so it should work with a square now 
-  //       TODO: ^ try and document properly
-  
    
    Wall[][] wallsH = new Wall[0][0];    // array of rows of horizontal walls
    Wall[][] wallsV = new Wall[0][0];    // array of columns of vertical walls
@@ -191,7 +185,9 @@ class Maze {
   
   public void display(float xTilt, float yTilt) {
     
-    // draw box inside
+    // draw box inside 
+    // (this creates a stripy pattern that covers up artifacts left from the tilting tray 
+    //  and creates a sense of depth)
     pushMatrix();
     for (int i = 15; i >= 0; i--) {
        translate(0, 0, -5);
@@ -346,7 +342,7 @@ class Maze {
     for (int w = 0; w < walls.length; w++) {
       Wall wall = walls[w];
       if (ballPos.y > wall.start.y && ballPos.y < wall.end.y) {
-        wall.highlight = true;
+        wall.watchingForBall = true; // just for debugging to visually highlight this wall
         // check left or right of wall, depending on tilt 
         //  and correct ballPos to keep the ball off the wall
         if (xSpeed >= 0 && ballPos.x >= wall.start.x - ballSize * .6     // ball rolling right & touching the left side of the wall
@@ -371,7 +367,7 @@ class Maze {
     for (int w = 0; w < walls.length; w++) {
       Wall wall = walls[w];
       if (ballPos.x > wall.start.x && ballPos.x < wall.end.x) {
-        wall.highlight = true;
+        wall.watchingForBall = true; // just for debugging to visually highlight this wall
         // check top or bottom of wall, depending on tilt 
         //  and correct ballPos to keep the ball off the wall
         if (ySpeed <= 0 && ballPos.y >= wall.start.y - ballSize * .6

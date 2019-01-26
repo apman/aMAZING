@@ -4,8 +4,9 @@ class Wall {
   public Point end;
   private String type;
   
-  // temp var for debugging (turn on to see which walls are actively watching out for the ball at any time)
-  public boolean highlight = false;
+  // temp var for debugging (set in Maze.avoidWallsV() and avoidWallsH() used to show a colour marking on the walls that are actively 
+  // watching out for the ball at any time)  --> see display(), 1. layer
+  public boolean watchingForBall = false;
   
   
   Wall(Point start, Point end, String type) {
@@ -47,9 +48,9 @@ class Wall {
       ellipse(end.x, end.y, lineWidth, lineWidth);
       strokeWeight(lineWidth);
       stroke(colors.get("shade"));
-      // tmp debugging color change:
-      //if (highlight) stroke(0, 255, 0);
-      highlight = false;
+      // tmp debugging color change: 
+      if (watchingForBall) stroke(0, 255, 0);  // (uncomment to see which walls are watching for the ball)
+      watchingForBall = false;
       line(start.x, start.y, end.x, end.y); 
      
       // 2. layer of 3D wall  (gray)
