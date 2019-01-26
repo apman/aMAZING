@@ -1,4 +1,4 @@
-class SoccerLayout extends MazeLayout {
+class SoccerLayout extends GameLayout {
   
   SoccerLayout() {
   

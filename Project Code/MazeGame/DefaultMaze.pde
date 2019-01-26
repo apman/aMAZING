@@ -1,4 +1,4 @@
-class DefaultMaze extends MazeLayout {
+class DefaultMaze extends GameLayout {
   
   DefaultMaze() {
   

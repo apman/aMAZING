@@ -13,7 +13,7 @@ class KeyController extends Controller {
     // translate cursor key strokes into tray tilt increase/decrease  (max ~ -3 and 3 degrees (in rad))
     xTilt += xTiltChange;  
     yTilt += yTiltChange;
-    xTilt = constrain(xTilt, -0.05, 0.05);  // not actually working! ???
+    xTilt = constrain(xTilt, -0.05, 0.05);  
     yTilt = constrain(yTilt, -0.05, 0.05);
   }
 
