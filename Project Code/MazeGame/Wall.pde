@@ -41,7 +41,7 @@ class Wall {
       
       // 1. layer of 3D wall (dark edges)
       translate(0, 0, 1);
-     noStroke();
+      noStroke();
       fill(colors.get("shade"));
       ellipse(start.x, start.y, lineWidth, lineWidth);
       ellipse(end.x, end.y, lineWidth, lineWidth);
@@ -50,21 +50,21 @@ class Wall {
       // tmp debugging color change:
       //if (highlight) stroke(0, 255, 0);
       highlight = false;
-     line(start.x, start.y, end.x, end.y); 
+      line(start.x, start.y, end.x, end.y); 
      
       // 2. layer of 3D wall  (gray)
       translate(0, 0, 1);
-       noStroke();
+      noStroke();
       fill(colors.get("mainColor"));
       ellipse(start.x, start.y, lineWidth * .8, lineWidth * .8);
       ellipse(end.x, end.y, lineWidth * .8, lineWidth * .8);
-     stroke(colors.get("mainColor"));
+      stroke(colors.get("mainColor"));
       strokeWeight(lineWidth * .8);
       line(start.x, start.y, end.x, end.y); 
  
       // 3. layer of 3D wall  (highlights)
       translate(0, 0, 1);
-       noStroke();
+      noStroke();
       fill(colors.get("highlight"));
       ellipse(start.x, start.y, lineWidth * .2, lineWidth * .2);
       ellipse(end.x, end.y, lineWidth * .2, lineWidth * .2);
