@@ -13,7 +13,7 @@ class KinectController extends Controller {
   Kinect kinect;
   
   float deg;
-  PImage img;
+  PImage img;  // depth image from the infra red camera
   int currentHue = 0;
   int currentBrightness = 0;
   int xWeight;
@@ -180,7 +180,7 @@ class KinectController extends Controller {
   private void displayCalibrationData(int dir) {
     fill(255);
     textAlign(CENTER);
-    textSize(25);  // TEMP SHOOULD BE 45
+    textSize(25);
     int currentWeight = (dir == LEFT || dir == RIGHT) ? xWeight : yWeight;
     int threshold = (dir == LEFT) ? minXWeight : (dir == RIGHT) ? maxXWeight : (dir == TOP) ? minYWeight : maxYWeight;
     int x = (dir == TOP || dir == BOTTOM) ? width/2 : (dir == LEFT) ? (width - 640)/4 : width - (width - 640)/4 ;
@@ -227,8 +227,6 @@ class KinectController extends Controller {
       }
     }
     if (relevantPoints > 0) {
-      //xWeight = (int)totalXWeight/relevantPoints;
-      //yWeight = (int)totalYWeight/relevantPoints;
       xWeight = (int)totalXWeight/relevantPoints;
       yWeight = (int)totalYWeight/relevantPoints;
     }
@@ -241,7 +239,7 @@ class KinectController extends Controller {
       xTilt = constrain(xTilt, -0.05, 0.05); 
     }
 
-    println(xWeight + " / " + yWeight + " (" + relevantPoints + " points)");
+    // println(xWeight + " / " + yWeight + " (" + relevantPoints + " points)");
 
   }
   

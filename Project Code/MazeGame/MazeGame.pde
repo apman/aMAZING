@@ -141,15 +141,13 @@ void turnOnMenu() {
   menuTurnedOnAt = millis(); 
 }
 
-//<<<<<<< HEAD
 void turnOnInfo() {
   showInfo = true;
   infoTurnedOnAt = millis(); 
 }
-//=======
+
 void hideMenu() {
   showMenu = false;
-//>>>>>>> add a button to switch between maze and soccer
 }
 
 void drawMenu() {
@@ -166,7 +164,7 @@ void drawMenu() {
   // Kinect specific stuff
   String cameraInstructions = "";
   if (currentController == kinectController) {
-    drawButton("Calibrate", width-180, 420, !kinectController.getCalibrationInProgress());  // TODO: make the boolean dynamic
+    drawButton("Calibrate", width-180, 420, !kinectController.getCalibrationInProgress()); 
     // Draw camera tilt instructions
     cameraInstructions = "Press UP / DOWN\nto adjust the\ncamera angle,\n'i' for info,\n'd' for debug lines,\n any key to exit camera screen\n";
   }

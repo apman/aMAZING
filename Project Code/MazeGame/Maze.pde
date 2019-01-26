@@ -116,7 +116,7 @@ class Maze {
         type = "bottomFrame";
       } 
          // ^^ outside walls are invisible so they don't interfere with the rounded edges of the frame,
-         //    but the still act as barriers and have shadows, so they need to be treated a bit different
+         //    but they still act as barriers and have shadows, so they need to be treated a bit differently
       for (int lineNum = 0; lineNum < wallRow.length; lineNum++) {
         Wall wall = new Wall(new Point(topLeft.x + 5 + wallRow[lineNum][0] * pathWidthH, 
                                         topLeft.y + 5 + row * pathWidthV),
@@ -140,7 +140,7 @@ class Maze {
         type = "rightFrame";
       } 
          // ^^ outside walls are invisible so they don't interfere with the rounded edges of the frame,
-         //    but the still act as barriers and have shadows, so they need to be treated a bit different
+         //    but they still act as barriers and have shadows, so they need to be treated a bit differently
       for (int lineNum = 0; lineNum < wallCol.length; lineNum++) {
         Wall wall = new Wall(new Point(topLeft.x + 5 + col * pathWidthH, 
                                         topLeft.y + 5 + wallCol[lineNum][0] * pathWidthV),
@@ -177,7 +177,7 @@ class Maze {
     // calculate best distance between walls based on ballSize and trayWidth or trayHeight (= space)
     
     // take a decent width to start with, see how many of them you can fit into 
-    //  the tray width/height and then adjust the pathWidth to fit an even number of 
+    //  the tray width/height and then adjust the pathWidth to fit a round number of 
     //  paths exactly into the frame (i.e. no half paths)
     float pathWidth = 3 * ballSize;
     int pathNum = round(space / pathWidth);
@@ -454,17 +454,17 @@ class Maze {
   }
   
   public float getAccelerationFactor() {
-    println("Acc: " + accelerationFactor);
+    // println("Acc: " + accelerationFactor);
     return (float)(round(accelerationFactor*10))/10;
   }
   
   public float getUpHillGravityFactor() {
-    println("Grav: " + upHillGravityFactor);
+    // println("Grav: " + upHillGravityFactor);
     return (float)(round(upHillGravityFactor*10))/10;
   }
   
   public float getBounceFactor() {
-    println("Bounce: " + bounceFactor);
+    // println("Bounce: " + bounceFactor);
     return (float)(round(bounceFactor*100))/100;
   }
 }
