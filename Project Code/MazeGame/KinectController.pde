@@ -172,6 +172,7 @@ class KinectController extends Controller {
     fill(0);
     textAlign(CENTER);
     textSize(45);
+    text(text, width/2 - 2, height/3 -2);      
     text(text, width/2 + 3, height/3 +3);      
     fill(255);
     text(text, width/2, height/3);      
@@ -183,10 +184,11 @@ class KinectController extends Controller {
     textSize(25);
     int currentWeight = (dir == LEFT || dir == RIGHT) ? xWeight : yWeight;
     int threshold = (dir == LEFT) ? minXWeight : (dir == RIGHT) ? maxXWeight : (dir == TOP) ? minYWeight : maxYWeight;
-    int x = (dir == TOP || dir == BOTTOM) ? width/2 : (dir == LEFT) ? (width - 640)/4 : width - (width - 640)/4 ;
-    int y = (dir == LEFT || dir == RIGHT) ? height/2 : (dir == TOP) ? (height - 520)/4 : height - (height - 520)/4 ;
-    String divider = (dir == LEFT || dir == RIGHT) ? "\n => \n" : " => ";
-    text(currentWeight + divider + threshold, x, y);      
+    int x = (dir == TOP || dir == BOTTOM) ? width/2 : (dir == LEFT) ? width/8 - 20 : width - width/8 + 20 ;
+    int y = (dir == LEFT || dir == RIGHT) ? height/2 : (dir == TOP) ? height/8 : height - height/8 ;
+    String divider = (dir == LEFT || dir == RIGHT) ? "\n\n" : "     ";
+    String space = (dir == LEFT || dir == RIGHT) ? "\n" : " ";
+    text("Current:" + space + currentWeight + divider + "Threshold:" + space + threshold, x, y);      
   }
   
   
