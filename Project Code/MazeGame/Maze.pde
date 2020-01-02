@@ -22,7 +22,8 @@ class Maze {
   private final IntDict ballColors = new IntDict();
   
   // ball 
-  private Point ballPos = new Point(-430, -330);   // start in top left corner
+  // private Point ballPos = new Point(-430, -330);   // start in top left corner
+  private Point ballPos;
   private float xSpeed = 0;
   private float ySpeed = 0;
   private float accelerationFactor = 4;
@@ -54,7 +55,7 @@ class Maze {
  
  
   Maze(int _boxWidth, int _boxHeight, GameLayout layout) {
-    
+
     // -- set colours: --
     // outer box frame
     boxColors.set("mainColor",170);
@@ -89,6 +90,8 @@ class Maze {
     pathWidthV = optimalPathWidth(trayHeight); 
     
     layoutType = (layout instanceof DefaultMaze) ? "maze" : "soccer";   
+    // start maze in top left corner, soccer in the center
+    ballPos = (layoutType == "maze") ? new Point(-430, -330) : new Point(0, 0);   
     
     createGoals();
     

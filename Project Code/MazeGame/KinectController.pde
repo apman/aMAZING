@@ -220,10 +220,10 @@ class KinectController extends Controller {
       for (int row = 10; row < img.height; row += 10) {
          int index = row * img.width + col;
          int currentPix = img.pixels[index];
-         if (brightness(currentPix) > 0 && hue(currentPix) < 100) {  // ignore black and blue pixels
+         if (brightness(currentPix) > 0 && hue(currentPix) < 80) {  // ignore black, blue and pixels
            totalXWeight += - width/2 + col;     // for left/right movement each valid colour counts the same, but the further right
                                                  //  a pixel the more it counts, center counts 0, left of center negative  
-           totalYWeight += hue(currentPix);  // for front/back movement red pixels count most, then yellow, and green the least
+           totalYWeight += hue(currentPix);  // for front/back movement red pixels count most, then yellow, and greenish yellow the least
            relevantPoints++;
          }
       }

@@ -101,20 +101,12 @@ void keyPressed() {
   else {
     // adjust ball speed
     switch (key) {
-      case ',': 
+      case 'v': 
         maze.adjustAcceleration("down");
         turnOnInfo();
         break;
-      case '.':
-        maze.adjustAcceleration("up");
-        turnOnInfo();
-        break;
-      case 'v':
-        maze.adjustUpHillGravity("down");
-        turnOnInfo();
-        break;
       case 'b':
-        maze.adjustUpHillGravity("up");
+        maze.adjustAcceleration("up");
         turnOnInfo();
         break;
       case 'n':
@@ -123,6 +115,14 @@ void keyPressed() {
         break;
       case 'm':
         maze.adjustBounce("up");
+        turnOnInfo();
+        break;
+      case ',':
+        maze.adjustUpHillGravity("down");
+        turnOnInfo();
+        break;
+      case '.':
+        maze.adjustUpHillGravity("up");
         turnOnInfo();
         break;
     }
@@ -170,7 +170,7 @@ void drawMenu() {
   }
   
   // show instructions
-  String generalInstructions = "Click anywhere to show the menu.\n\nAdjustment keys:\nacceleration: ,/.\nbounce: n/m\n'uphillGravity': v/b";
+  String generalInstructions = "Click anywhere to show the menu.\n\nAdjustment keys:\nacceleration: v/b\nbounce: n/m\n'uphillGravity': ,/.";
   String instructions = (currentController == kinectController) ? cameraInstructions : generalInstructions;
   
   rectMode(CORNER);

@@ -4,8 +4,11 @@ class Wall {
   public Point end;
   private String type;
   
-  // temp var for debugging (set in Maze.avoidWallsV() and avoidWallsH() used to show a colour marking on the walls that are actively 
-  // watching out for the ball at any time)  --> see display(), 1. layer
+  // temp var for debugging (set in Maze.avoidWallsV() and avoidWallsH())
+  //      tracks which wall is currently on alert to watch for collisions.
+  //      Used to show a colour marking on the walls that are actively 
+  //      watching out for the ball at any time)  
+  //      --> see display(), 1. layer for turning the markers on/off
   public boolean watchingForBall = false;
   
   
@@ -49,7 +52,7 @@ class Wall {
       strokeWeight(lineWidth);
       stroke(colors.get("shade"));
       // tmp debugging color change: 
-      if (watchingForBall) stroke(0, 255, 0);  // (uncomment to see which walls are watching for the ball)
+      // if (watchingForBall) stroke(0, 255, 0);  // (uncomment to see which walls are watching for the ball)
       watchingForBall = false;
       line(start.x, start.y, end.x, end.y); 
      
