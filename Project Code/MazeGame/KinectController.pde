@@ -13,7 +13,7 @@ class KinectController extends Controller {
   Kinect kinect;
   
   float deg;
-  PImage img;
+  PImage img;  // depth image from the infra red camera
   int currentHue = 0;
   int currentBrightness = 0;
   int xWeight;
@@ -172,6 +172,7 @@ class KinectController extends Controller {
     fill(0);
     textAlign(CENTER);
     textSize(45);
+    text(text, width/2 - 2, height/3 -2);      
     text(text, width/2 + 3, height/3 +3);      
     fill(255);
     text(text, width/2, height/3);      
@@ -180,13 +181,14 @@ class KinectController extends Controller {
   private void displayCalibrationData(int dir) {
     fill(255);
     textAlign(CENTER);
-    textSize(25);  // TEMP SHOOULD BE 45
+    textSize(25);
     int currentWeight = (dir == LEFT || dir == RIGHT) ? xWeight : yWeight;
     int threshold = (dir == LEFT) ? minXWeight : (dir == RIGHT) ? maxXWeight : (dir == TOP) ? minYWeight : maxYWeight;
-    int x = (dir == TOP || dir == BOTTOM) ? width/2 : (dir == LEFT) ? (width - 640)/4 : width - (width - 640)/4 ;
-    int y = (dir == LEFT || dir == RIGHT) ? height/2 : (dir == TOP) ? (height - 520)/4 : height - (height - 520)/4 ;
-    String divider = (dir == LEFT || dir == RIGHT) ? "\n => \n" : " => ";
-    text(currentWeight + divider + threshold, x, y);      
+    int x = (dir == TOP || dir == BOTTOM) ? width/2 : (dir == LEFT) ? width/8 - 20 : width - width/8 + 20 ;
+    int y = (dir == LEFT || dir == RIGHT) ? height/2 : (dir == TOP) ? height/8 : height - height/8 ;
+    String divider = (dir == LEFT || dir == RIGHT) ? "\n\n" : "     ";
+    String space = (dir == LEFT || dir == RIGHT) ? "\n" : " ";
+    text("Current:" + space + currentWeight + divider + "Threshold:" + space + threshold, x, y);      
   }
   
   
@@ -218,17 +220,15 @@ class KinectController extends Controller {
       for (int row = 10; row < img.height; row += 10) {
          int index = row * img.width + col;
          int currentPix = img.pixels[index];
-         if (brightness(currentPix) > 0 && hue(currentPix) < 100) {  // ignore black and blue pixels
+         if (brightness(currentPix) > 0 && hue(currentPix) < 80) {  // ignore black, blue and pixels
            totalXWeight += - width/2 + col;     // for left/right movement each valid colour counts the same, but the further right
                                                  //  a pixel the more it counts, center counts 0, left of center negative  
-           totalYWeight += hue(currentPix);  // for front/back movement red pixels count most, then yellow, and green the least
+           totalYWeight += hue(currentPix);  // for front/back movement red pixels count most, then yellow, and greenish yellow the least
            relevantPoints++;
          }
       }
     }
     if (relevantPoints > 0) {
-      //xWeight = (int)totalXWeight/relevantPoints;
-      //yWeight = (int)totalYWeight/relevantPoints;
       xWeight = (int)totalXWeight/relevantPoints;
       yWeight = (int)totalYWeight/relevantPoints;
     }
@@ -241,7 +241,7 @@ class KinectController extends Controller {
       xTilt = constrain(xTilt, -0.05, 0.05); 
     }
 
-    println(xWeight + " / " + yWeight + " (" + relevantPoints + " points)");
+    // println(xWeight + " / " + yWeight + " (" + relevantPoints + " points)");
 
   }
   

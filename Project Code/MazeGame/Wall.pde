@@ -4,8 +4,12 @@ class Wall {
   public Point end;
   private String type;
   
-  // temp var for debugging (turn on to see which walls are actively watching out for the ball at any time)
-  public boolean highlight = false;
+  // temp var for debugging (set in Maze.avoidWallsV() and avoidWallsH())
+  //      tracks which wall is currently on alert to watch for collisions.
+  //      Used to show a colour marking on the walls that are actively 
+  //      watching out for the ball at any time)  
+  //      --> see display(), 1. layer for turning the markers on/off
+  public boolean watchingForBall = false;
   
   
   Wall(Point start, Point end, String type) {
@@ -41,30 +45,30 @@ class Wall {
       
       // 1. layer of 3D wall (dark edges)
       translate(0, 0, 1);
-     noStroke();
+      noStroke();
       fill(colors.get("shade"));
       ellipse(start.x, start.y, lineWidth, lineWidth);
       ellipse(end.x, end.y, lineWidth, lineWidth);
       strokeWeight(lineWidth);
       stroke(colors.get("shade"));
-      // tmp debugging color change:
-      //if (highlight) stroke(0, 255, 0);
-      highlight = false;
-     line(start.x, start.y, end.x, end.y); 
+      // tmp debugging color change: 
+      // if (watchingForBall) stroke(0, 255, 0);  // (uncomment to see which walls are watching for the ball)
+      watchingForBall = false;
+      line(start.x, start.y, end.x, end.y); 
      
       // 2. layer of 3D wall  (gray)
       translate(0, 0, 1);
-       noStroke();
+      noStroke();
       fill(colors.get("mainColor"));
       ellipse(start.x, start.y, lineWidth * .8, lineWidth * .8);
       ellipse(end.x, end.y, lineWidth * .8, lineWidth * .8);
-     stroke(colors.get("mainColor"));
+      stroke(colors.get("mainColor"));
       strokeWeight(lineWidth * .8);
       line(start.x, start.y, end.x, end.y); 
  
       // 3. layer of 3D wall  (highlights)
       translate(0, 0, 1);
-       noStroke();
+      noStroke();
       fill(colors.get("highlight"));
       ellipse(start.x, start.y, lineWidth * .2, lineWidth * .2);
       ellipse(end.x, end.y, lineWidth * .2, lineWidth * .2);

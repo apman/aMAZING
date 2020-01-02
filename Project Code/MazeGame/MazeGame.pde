@@ -101,20 +101,12 @@ void keyPressed() {
   else {
     // adjust ball speed
     switch (key) {
-      case ',': 
+      case 'v': 
         maze.adjustAcceleration("down");
         turnOnInfo();
         break;
-      case '.':
-        maze.adjustAcceleration("up");
-        turnOnInfo();
-        break;
-      case 'v':
-        maze.adjustUpHillGravity("down");
-        turnOnInfo();
-        break;
       case 'b':
-        maze.adjustUpHillGravity("up");
+        maze.adjustAcceleration("up");
         turnOnInfo();
         break;
       case 'n':
@@ -123,6 +115,14 @@ void keyPressed() {
         break;
       case 'm':
         maze.adjustBounce("up");
+        turnOnInfo();
+        break;
+      case ',':
+        maze.adjustUpHillGravity("down");
+        turnOnInfo();
+        break;
+      case '.':
+        maze.adjustUpHillGravity("up");
         turnOnInfo();
         break;
     }
@@ -141,15 +141,13 @@ void turnOnMenu() {
   menuTurnedOnAt = millis(); 
 }
 
-//<<<<<<< HEAD
 void turnOnInfo() {
   showInfo = true;
   infoTurnedOnAt = millis(); 
 }
-//=======
+
 void hideMenu() {
   showMenu = false;
-//>>>>>>> add a button to switch between maze and soccer
 }
 
 void drawMenu() {
@@ -166,13 +164,13 @@ void drawMenu() {
   // Kinect specific stuff
   String cameraInstructions = "";
   if (currentController == kinectController) {
-    drawButton("Calibrate", width-180, 420, !kinectController.getCalibrationInProgress());  // TODO: make the boolean dynamic
+    drawButton("Calibrate", width-180, 420, !kinectController.getCalibrationInProgress()); 
     // Draw camera tilt instructions
     cameraInstructions = "Press UP / DOWN\nto adjust the\ncamera angle,\n'i' for info,\n'd' for debug lines,\n any key to exit camera screen\n";
   }
   
   // show instructions
-  String generalInstructions = "Click anywhere to show the menu.\n\nAdjustment keys:\nacceleration: ,/.\nbounce: n/m\n'uphillGravity': v/b";
+  String generalInstructions = "Click anywhere to show the menu.\n\nAdjustment keys:\nacceleration: v/b\nbounce: n/m\n'uphillGravity': ,/.";
   String instructions = (currentController == kinectController) ? cameraInstructions : generalInstructions;
   
   rectMode(CORNER);
