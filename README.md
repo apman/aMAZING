@@ -7,7 +7,7 @@ This little demo was written in the open source programming language _Processing
 
 At that time I was a DevDegree student at Shopify, and as luck would have it, Prince Charles took an interest in innovative educational programs, visited us at Shopify and volunteered to play!
  
-| ![Prince Charles playing aMazing at Shopify sm](https://github.com/apman/aMAZING/assets/1944636/b57bf5e2-62ad-447d-93c6-24e63a3bdb88) | ![Prince Charles playing aMazing at Shopify engaged sm](https://github.com/apman/aMAZING/assets/1944636/5ad19c4d-e571-40ad-91c5-1a9c6d5ad1b5) |
+| ![Processing Days - Presentation 2024-06-25 19-20-37](https://github.com/apman/aMAZING/assets/1944636/7ff21ae9-48d0-4ea7-a1b0-eebf544e9a80) | ![Processing Days - Presentation 2024-06-25 19-20-10](https://github.com/apman/aMAZING/assets/1944636/c239c041-e5f2-4006-9c94-73bf81795aba) |
 |-----------|-----------|
 
 
