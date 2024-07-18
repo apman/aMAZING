@@ -3,7 +3,7 @@
 # aMAZING
 An interactive marble maze to be operated by physical movement of player(s) using **Microsoft Kinect**.
 
-This little demo was written in the open source programming language _Processing_, which is built on top of the Java. I wrote it as a first year Computer Science project in 2017.
+This little demo was written in the open source programming language _Processing_, which is built on top of Java. I wrote it as a first year Computer Science project in 2017.
 
 At that time I was a DevDegree student at Shopify, and as luck would have it, Prince Charles took an interest in innovative educational programs, visited us at Shopify and volunteered to play!
  
